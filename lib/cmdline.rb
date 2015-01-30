@@ -29,7 +29,13 @@ class CmdLine
       opt.on '-r', '--refresh=MS', Float, 'Refresh the stats display every MS milliseconds' do |refresh_rate|
         @config[:refresh_rate] = refresh_rate
       end
+      
+      @config[:command] = 'get'
+      opt.on('--command=COMMAND', [:get, :set], 'Memcache command to sniff: get (default), set') do |command|
+        @config[:command] = command
+      end
 
+	  
       opt.on_tail '-h', '--help', 'Show usage info' do
         puts opts
         exit

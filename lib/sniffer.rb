@@ -8,6 +8,7 @@ class MemcacheSniffer
     @source  = config[:nic]
     @port    = config[:port]
     @host    = config[:host]
+    @pattern = self.pattern(config[:command])
 
     @metrics = {}
     @metrics[:calls]   = {}
@@ -36,7 +37,7 @@ class MemcacheSniffer
       @metrics[:stats] = cap.stats
 
       # parse key name, and size from VALUE responses
-      if packet.raw_data =~ /VALUE (\S+) \S+ (\S+)/
+      if packet.raw_data =~ @pattern
         key   = $1
         bytes = $2
 
@@ -55,6 +56,14 @@ class MemcacheSniffer
     end
 
     cap.close
+  end
+  
+  def pattern(command)
+    if command.to_s == 'set'
+       return Regexp.new('set (\S+) \d+ \d+ (\d+)')
+    else
+       return Regexp.new('VALUE (\S+) \S+ (\S+)')
+    end
   end
 
   def done
